@@ -1,0 +1,44 @@
+# (1)
+cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+project(trajectory_framework)
+
+# (2)
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(/home/kafpey/Ipopt/src/Interfaces)
+
+set(ADDED_FILES
+  visualise_angles.py
+  run_batch.py
+  plot_data.py
+  )
+
+
+foreach(_script ${ADDED_FILES})
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/${_script}
+    ${PROJECT_BINARY_DIR}/${_script}
+    COPYONLY
+    )
+endforeach()
+
+
+# (4)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/combined_doses)
+
+SET(IPOPT_LIBS "-Wl,--rpath -Wl,/home/kafpey/Softwares/ipopt313/lib -L/home/kafpey/Softwares/ipopt313/lib -lipopt -lgfortran -ldl -lm -lblas -llapack -lquadmath -Wl,--no-as-needed")
+# (5)
+add_executable(trajectory_framework trajectory_framework.cc ${sources} ${headers})
+target_link_libraries(trajectory_framework ${IPOPT_LIBS})
+# (6)
+install(TARGETS trajectory_framework DESTINATION bin)
+SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O -pipe -DNDEBUG -pedantic-errors -Wparentheses -Wreturn-type -Wcast-qual -Wall -Wpointer-arith -Wwrite-strings -Wno-unknown-pragmas -Wno-long-long -std=c++11 -Dipopt_BUILD -m64 -DIL_STD -I/home/kafpey/Softwares/ipopt313/include/coin-or -I/home/kafpey/ThirdParty ")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
+set(CMAKE_F_FLAGS "${CMAKE_F_FLAGS} -fopenmp")
+
+set(CMAKE_BUILD_TYPE Debug)
+

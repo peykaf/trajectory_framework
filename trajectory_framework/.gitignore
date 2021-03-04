@@ -1,0 +1,6 @@
+patients/
+build/
+debug/
+CMakeLists.txt
+*.data
+.vscode
